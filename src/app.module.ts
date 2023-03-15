@@ -20,7 +20,7 @@ import { TwitterModule } from './twitter/twitter.module';
       useFactory: async (configService: ConfigService) => ({
         type: 'mysql', // 数据库类型
         autoLoadEntities: true,
-        entities: [], // 数据表实体
+        keepConnectionAlive: true,
         host: configService.get('DB_HOST'), // 主机，默认为localhost
         port: configService.get<number>('DB_PORT'), // 端口号
         username: configService.get('DB_USER'), // 用户名
