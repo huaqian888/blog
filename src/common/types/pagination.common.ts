@@ -1,5 +1,5 @@
 export class Pagination {
-  limit: number;
+  limit?: number;
 
-  pageOffset: number;
+  pageOffset?: number;
 }

@@ -17,7 +17,7 @@ export class CommentService {
     private readonly blogRepository: Repository<Blog>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async releaseComment(releaseCommentDTO: ReleaseCommentDTO) {
     const { blogId, commentatorId, replierId } = releaseCommentDTO;
@@ -87,7 +87,6 @@ export class CommentService {
             relations: ['blog', 'commentator', 'replier'],
           });
           tempComments.forEach((v) => {
-            console.log(v);
             blogMainComments[i].children.push(v);
           });
           resolve(null);

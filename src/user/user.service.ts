@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { RegisterDTO } from 'src/user/dto/register.dto';
 import { LoginDTO } from 'src/user/dto/login.dto';
 import { ListUsersDTO } from 'src/user/dto/listUsers.dto';
@@ -10,28 +10,38 @@ import { Like, Repository } from 'typeorm';
 import * as fs from 'fs';
 import { join } from 'path';
 import { QueryBloggerVO } from 'src/user/vo/queryBlogger.vo';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userResository: Repository<User>,
+    private configService: ConfigService,
   ) {}
 
   async register(registerDTO: RegisterDTO) {
     const { userName } = registerDTO;
-    const user = await this.userResository.findOneBy({ userName });
+    const user = await this.userResository.findOneBy({
+      userName,
+    });
     if (user) {
-      throw new Error('该用户名已存在');
+      throw new Error('该用户已存在');
     }
-    registerDTO.userType = 1;
-    await this.userResository.save(registerDTO);
+    await this.userResository.save({
+      userName: registerDTO.userName,
+      userPasswd: registerDTO.passwd,
+      userType: 1,
+    });
     return null;
   }
 
   async login(loginDTO: LoginDTO) {
-    const { userName } = loginDTO;
-    const user = await this.userResository.findOneBy({ userName });
+    const { userName, passwd } = loginDTO;
+    const user = await this.userResository.findOneBy({
+      userName,
+      userPasswd: passwd,
+    });
     if (!user) {
-      throw new Error('用户名或密码错误');
+      throw new HttpException('该用户不存在', 444);
     }
     const { userId } = user;
     return this.queryUserInfo({ userId });
@@ -76,7 +86,7 @@ export class UserService {
     const { userId } = userIdDTO;
     const user = await this.userResository.findOneBy({ userId });
     if (!user) {
-      throw new Error('该用户不存在');
+      throw new HttpException('该用户不存在', 444);
     }
     delete user.userPasswd;
     return user;
@@ -84,31 +94,37 @@ export class UserService {
 
   async updateUserInfo(avatar, updateUserInfoDTO: UpdateUserInfoDTO) {
     const { userId, userName } = updateUserInfoDTO;
-    const user = await this.userResository.findOneBy({ userId });
-    const fileName = avatar.filename;
-    if (!user) {
-      fs.rmSync(join(__dirname, '../../image') + '\\' + fileName);
-      throw new Error('该用户不存在');
+    const user = await this.userResository.findOneBy({ userId, userName });
+    if (avatar) {
+      const fileName = avatar.filename;
+      if (!user) {
+        fs.rmSync(join(__dirname, '../../image') + '\\' + fileName);
+        throw new HttpException('该用户不存在', 444);
+      }
+      if (!user.userAvatar.includes('default')) {
+        const userAvatarPath = user.userAvatar.split('/').pop();
+        fs.rmSync(join(__dirname, '../../image') + '\\' + userAvatarPath);
+      }
+      updateUserInfoDTO.userAvatar = `${this.configService.get(
+        'BASE_URL',
+      )}/${fileName}`;
     }
-    const updateUser = await this.userResository.findOneBy({ userName });
-    if (updateUser) {
-      fs.rmSync(join(__dirname, '../../image') + '\\' + fileName);
-      throw new Error('该用户名已存在');
-    }
-
-    if (!user.userAvatar.includes('default')) {
-      const userAvatarPath = user.userAvatar.split('/').pop();
-      fs.rmSync(join(__dirname, '../../image') + '\\' + userAvatarPath);
+    if (userName) {
+      const updateUser = await this.userResository.findOneBy({ userName });
+      if (updateUser) {
+        throw new HttpException('该账户已存在', 444);
+      }
     }
     delete updateUserInfoDTO.userType;
     await this.userResository.update(userId, updateUserInfoDTO);
-    return null;
+    return this.queryUserInfo({ userId });
   }
 
   async queryBloggerInfo() {
     const res: QueryBloggerVO = {
       userQQ: '1107507933',
-      userWx: 'a1107507933',
+      userWx: 'huaqian57',
+      userGit: 'https://github.com/huaqian888/blogUni-app',
       userName: '',
       userAvatar: '',
     };

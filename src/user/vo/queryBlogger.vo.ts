@@ -3,6 +3,8 @@ export class QueryBloggerVO {
 
   userAvatar: string;
 
+  userGit: string;
+
   userWx: string;
 
   userQQ: string;

@@ -1,4 +1,3 @@
-import { Comment } from '../comment.entity';
 export class QueryCommentsVO {
   blogId: number;
 

@@ -9,7 +9,6 @@ function parseEnv() {
   if (!fs.existsSync(localEnv) && !fs.existsSync(prodEnv)) {
     throw new Error('缺少环境配置文件');
   }
-  console.log(localEnv);
   const filePath = isProd && fs.existsSync(prodEnv) ? prodEnv : localEnv;
   return { path: filePath };
 }

@@ -19,7 +19,7 @@ export class BlogService {
   ) {}
 
   async listBlog(listBlogDTO: ListBlogDTO) {
-    const { pageOffset, limit, blogTitle } = listBlogDTO;
+    const { pageOffset = 1, limit = 10, blogTitle } = listBlogDTO;
     const skip = (pageOffset - 1) * limit;
 
     const params = {
