@@ -29,9 +29,12 @@ export class TwitterService {
       take: limit,
     };
 
-    const [twitterList, count] = await this.twitterRepository.findAndCount(
-      params,
-    );
+    const [twitterList, count] = await this.twitterRepository.findAndCount({
+      order: {
+        twitterReleaseDateTime: 'DESC',
+      },
+      ...params,
+    });
     return {
       twitterList,
       count,

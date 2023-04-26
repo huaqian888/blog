@@ -24,7 +24,7 @@ export class UserService {
       userName,
     });
     if (user) {
-      throw new Error('该用户已存在');
+      throw new HttpException('该用户不存在', 444);
     }
     await this.userResository.save({
       userName: registerDTO.userName,
@@ -41,7 +41,7 @@ export class UserService {
       userPasswd: passwd,
     });
     if (!user) {
-      throw new HttpException('该用户不存在', 444);
+      throw new HttpException('密码错误', 444);
     }
     const { userId } = user;
     return this.queryUserInfo({ userId });

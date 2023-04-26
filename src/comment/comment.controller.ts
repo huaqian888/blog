@@ -30,4 +30,11 @@ export class CommentController {
   deleteComment(@Body() deleteCommentDTO: CommentIdDTO) {
     return this.commentService.deleteComment(deleteCommentDTO);
   }
+
+  @Post('queryCommentById')
+  @ApiOkResponse({ description: '通过Id查询评论' })
+  @HttpCode(HttpStatus.OK)
+  queryCommentById(@Body() commentId: CommentIdDTO) {
+    return this.commentService.queryCommentById(commentId);
+  }
 }

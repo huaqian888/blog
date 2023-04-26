@@ -1,9 +1,11 @@
+import { User } from 'src/user/user.entity';
+
 export class QueryCommentsVO {
   blogId: number;
 
   commentId: number;
 
-  commentatorId: number;
+  commentator: User;
 
   commentContent: string;
 
@@ -13,5 +15,5 @@ export class QueryCommentsVO {
 
   quotedCommentId?: number;
 
-  replierId?: number;
+  replier?: User;
 }

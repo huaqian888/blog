@@ -7,7 +7,7 @@ import { ListBlogDTO } from 'src/blog/dto/listBlog.dto';
 import { UpdateBlogDTO } from 'src/blog/dto/updateBlog.dto';
 import { YearDTO } from 'src/blog/dto/year.dto';
 import { QueryBlogDetailsVO } from 'src/blog/vo/queryBlogDetails.vo';
-import { Like, Repository } from 'typeorm';
+import { Like, Not, Repository } from 'typeorm';
 import * as fs from 'fs';
 import { join } from 'path';
 
@@ -27,7 +27,9 @@ export class BlogService {
       take: limit,
     };
 
-    const whereParams = {};
+    const whereParams = {
+      blogId: Not(0),
+    };
 
     if (blogTitle) {
       Object.assign(whereParams, {
